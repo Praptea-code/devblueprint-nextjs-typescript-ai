@@ -1,3 +1,5 @@
+export type { ArchitectureResponse } from "@/lib/validation/architecture";
+
 export interface ProjectInput {
   idea: string;
   projectType?: string;
