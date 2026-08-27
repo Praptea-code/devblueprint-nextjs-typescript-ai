@@ -12,6 +12,7 @@ import {
   Check,
 } from "lucide-react";
 import type { ArchitectureResponse } from "@/types";
+import { ArchitectureSkeleton } from "@/components/architecture-skeleton";
 import { OverviewTab } from "@/components/tabs/overview-tab";
 import { ArchitectureDiagram } from "@/components/tabs/architecture-diagram";
 import { DatabaseTab } from "@/components/tabs/database-tab";
@@ -80,11 +81,7 @@ export default function ArchitecturePage() {
   };
 
   if (!architecture) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <ArchitectureSkeleton />;
   }
 
   return (
