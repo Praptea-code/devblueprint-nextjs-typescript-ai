@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArchAI: Turn Your Idea Into Architecture",
+  title: "ArchAI",
   description:
     "AI-powered tool that transforms project ideas into complete technical blueprints with architecture diagrams, database schemas, API designs, and development roadmaps.",
 };
@@ -34,7 +34,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >

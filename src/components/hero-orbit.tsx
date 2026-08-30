@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   Atom,
   Layers,
@@ -62,7 +62,11 @@ const BADGE_SIZE = 40;
 const FLOAT_DURATIONS = [5.2, 6.1, 7.4, 5.8, 8, 6.6, 7.1, 5.5];
 const FLOAT_DELAYS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
 
-export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
+export const HeroOrbit = memo(function HeroOrbit({
+  heroWidth,
+  heroHeight,
+  contentRect,
+}: OrbitProps) {
   const spec = useMemo(() => {
     // If runtime measurement hasn't landed yet (effect not run / 0-size layout
     // on first paint), fall back to the hero's designed desktop proportions so
@@ -220,4 +224,4 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
       })}
     </div>
   );
-}
+});

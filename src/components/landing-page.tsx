@@ -78,8 +78,12 @@ export function LandingPage({
 
   // Runtime measurement of the hero + inner content column so the orbit's
   // rings and icons are sized/placed against the REAL rendered bounds.
+  // Measured once on mount and on window resize ONLY (no ResizeObserver), so
+  // internally-driven layout changes like the optional-details expand/collapse
+  // can never shift the orbit.
   const mainRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
   const [orbit, setOrbit] = useState<{
     w: number;
     h: number;
@@ -93,19 +97,28 @@ export function LandingPage({
       if (!hero || !content) return;
       const hr = hero.getBoundingClientRect();
       const cr = content.getBoundingClientRect();
+      // Exclude the optional-details panel from the measured height: it lives
+      // inside the input card, so expanding/collapsing it grows the hero and
+      // content height. Subtracting its current height keeps the content rect
+      // tied to the COLLAPSED layout (badges, headline, subtext, activity
+      // card, textarea + button row) even if a window resize lands mid-toggle.
+      const expansion = optionsRef.current
+        ? Math.max(0, optionsRef.current.getBoundingClientRect().height)
+        : 0;
       setOrbit({
         w: hr.width,
         h: hr.height,
-        content: { left: cr.left - hr.left, top: cr.top - hr.top, w: cr.width, h: cr.height },
+        content: {
+          left: cr.left - hr.left,
+          top: cr.top - hr.top,
+          w: cr.width,
+          h: Math.max(cr.height - expansion, 1),
+        },
       });
     };
     measure();
-    const ro = new ResizeObserver(measure);
-    if (mainRef.current) ro.observe(mainRef.current);
-    if (contentRef.current) ro.observe(contentRef.current);
     window.addEventListener("resize", measure);
     return () => {
-      ro.disconnect();
       window.removeEventListener("resize", measure);
     };
   }, []);
@@ -299,11 +312,20 @@ export function LandingPage({
               </div>
 
               {/* Optional fields */}
-              {showOptions && (
+              <div
+                id="optional-fields"
+                ref={optionsRef}
+                className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                  showOptions ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                }`}
+              >
                 <div
-                  id="optional-fields"
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1 duration-200"
+                  inert={!showOptions}
+                  className={`overflow-hidden min-h-0 transition-opacity duration-200 ${
+                    showOptions ? "opacity-100" : "opacity-0"
+                  }`}
                 >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-xs font-medium text-muted-foreground">
                       Project Type
@@ -365,8 +387,9 @@ export function LandingPage({
                       className="w-full rounded-md border border-black/15 bg-background shadow-sm px-3 py-2 text-sm dark:border-border/50 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
                     />
                   </div>
+                  </div>
                 </div>
-              )}
+              </div>
 
               {/* Action row: optional-details toggle + generate, centered */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
