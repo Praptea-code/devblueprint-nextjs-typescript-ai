@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import BackgroundLayer from "@/components/reflect-background";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,7 +38,6 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <BackgroundLayer />
           <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
