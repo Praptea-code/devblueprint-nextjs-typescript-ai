@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +13,6 @@ import {
   Sparkles,
   Code2,
   Database,
-  Layers,
   Loader2,
   History,
   Clock,
@@ -100,9 +100,13 @@ export function LandingPage({
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Layers className="w-4 h-4 text-primary" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="ArchAI logo"
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain"
+            />
             <span className="font-semibold text-lg">ArchAI</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -344,9 +348,13 @@ export function LandingPage({
           <div className="flex flex-col sm:flex-row sm:items-start gap-8 sm:gap-12">
             <div className="flex-1 space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <Layers className="w-3.5 h-3.5 text-primary" />
-                </div>
+                <Image
+                  src="/logo.png"
+                  alt="ArchAI logo"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 object-contain"
+                />
                 <span className="font-semibold text-lg text-foreground">ArchAI</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm">

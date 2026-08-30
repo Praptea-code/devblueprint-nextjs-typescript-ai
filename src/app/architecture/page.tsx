@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   Download,
   Copy,
-  Layers,
   Check,
 } from "lucide-react";
 import type { ArchitectureResponse } from "@/types";
@@ -99,9 +99,13 @@ export default function ArchitecturePage() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
-                <Layers className="w-3 h-3 text-primary" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="ArchAI logo"
+                width={24}
+                height={24}
+                className="h-6 w-6 object-contain"
+              />
               <span className="font-semibold text-sm">{architecture.overview.projectName}</span>
             </div>
           </div>

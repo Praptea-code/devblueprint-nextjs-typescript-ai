@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Layers } from "lucide-react";
+import Image from "next/image";
 
 export default function PrivacyPage() {
   return (
@@ -7,9 +7,13 @@ export default function PrivacyPage() {
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
-              <Layers className="w-3 h-3 text-primary" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="ArchAI logo"
+              width={24}
+              height={24}
+              className="h-6 w-6 object-contain"
+            />
             <span className="font-semibold text-sm text-foreground">ArchAI</span>
           </Link>
           <Link
