@@ -26,7 +26,7 @@ export function SiteNav({ children }: SiteNavProps) {
     !mounted || resolvedTheme !== "dark" ? "/logo.png" : "/logo2.png";
 
   return (
-    <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+    <header className="border-b border-border/50 bg-background/60 backdrop-blur-md sticky top-0 z-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Image
