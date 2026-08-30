@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
+import type { HistoryEntry } from "@/lib/utils/history";
 import {
   ArrowRight,
   Sparkles,
@@ -11,6 +14,11 @@ import {
   Database,
   Layers,
   Loader2,
+  History,
+  Clock,
+  Trash2,
+  ChevronDown,
+  GitBranch,
 } from "lucide-react";
 
 const EXAMPLE_IDEAS = [
@@ -35,14 +43,43 @@ const EXAMPLE_IDEAS = [
 interface LandingPageProps {
   onGenerate: (idea: string, options?: { projectType?: string; techStack?: string; experienceLevel?: string }) => void;
   isGenerating: boolean;
+  history: HistoryEntry[];
+  onHistoryClick: (entry: HistoryEntry) => void;
+  onDeleteHistory: (id: string) => void;
 }
 
-export function LandingPage({ onGenerate, isGenerating }: LandingPageProps) {
+export function LandingPage({
+  onGenerate,
+  isGenerating,
+  history,
+  onHistoryClick,
+  onDeleteHistory,
+}: LandingPageProps) {
   const [idea, setIdea] = useState("");
   const [projectType, setProjectType] = useState("");
   const [techStack, setTechStack] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
   const [showOptions, setShowOptions] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!historyOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (historyRef.current && !historyRef.current.contains(e.target as Node)) {
+        setHistoryOpen(false);
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setHistoryOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [historyOpen]);
 
   const handleSubmit = () => {
     if (!idea.trim()) return;
@@ -69,14 +106,84 @@ export function LandingPage({ onGenerate, isGenerating }: LandingPageProps) {
             <span className="font-semibold text-lg">ArchAI</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="hidden sm:flex items-center gap-1.5">
-              <Code2 className="w-3.5 h-3.5" />
-              AI-Powered
-            </span>
-            <span className="hidden sm:flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5" />
-              Full Architecture
-            </span>
+            <div className="hidden sm:flex items-center gap-5">
+              <span className="flex items-center gap-1.5">
+                <Code2 className="w-3.5 h-3.5" />
+                AI-Powered
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5" />
+                Full Architecture
+              </span>
+
+              <div className="relative" ref={historyRef}>
+                <button
+                  type="button"
+                  onClick={() => setHistoryOpen((open) => !open)}
+                  aria-haspopup="menu"
+                  aria-expanded={historyOpen}
+                  className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  Recent
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform ${historyOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {historyOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-72 rounded-lg border border-border bg-popover text-popover-foreground shadow-lg overflow-hidden z-50">
+                    <div className="px-3 py-2 text-xs font-medium text-muted-foreground border-b border-border/50">
+                      Recent architectures
+                    </div>
+                    {history.length === 0 ? (
+                      <p className="px-3 py-4 text-sm text-muted-foreground text-center">
+                        No recent architectures yet
+                      </p>
+                    ) : (
+                      <div className="max-h-72 overflow-y-auto">
+                        {history.map((entry) => (
+                          <div
+                            key={entry.id}
+                            role="menuitem"
+                            className="group flex items-center justify-between gap-2 px-3 py-2 cursor-pointer hover:bg-muted/60 transition-colors"
+                            onClick={() => {
+                              onHistoryClick(entry);
+                              setHistoryOpen(false);
+                            }}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">
+                                  {entry.projectName}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {entry.idea}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              aria-label={`Delete ${entry.projectName}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteHistory(entry.id);
+                              }}
+                              className="shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted transition-opacity"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -187,7 +294,7 @@ export function LandingPage({ onGenerate, isGenerating }: LandingPageProps) {
               <Button
                 onClick={handleSubmit}
                 disabled={!idea.trim() || isGenerating}
-                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full sm:w-auto bg-white text-black border border-black/10 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
                 size="lg"
               >
                 {isGenerating ? (
@@ -232,8 +339,71 @@ export function LandingPage({ onGenerate, isGenerating }: LandingPageProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-6 text-center text-sm text-muted-foreground">
-        <p>ArchAI — Built for developers who dream in architecture</p>
+      <footer className="border-t border-border/50 bg-background/80 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-8 sm:gap-12">
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Layers className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <span className="font-semibold text-lg text-foreground">ArchAI</span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                ArchAI — Built for developers who dream in architecture. Turn ideas
+                into complete technical blueprints.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-x-10 gap-y-4 text-sm">
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Legal
+                </h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Terms of Service
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Resources
+                </h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <a
+                      href="https://github.com/Praptea-code/devblueprint-nextjs-typescript-ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <GitBranch className="w-3.5 h-3.5" />
+                      GitHub
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+            <p>© 2026 ArchAI</p>
+            <p>All data is stored locally in your browser.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
