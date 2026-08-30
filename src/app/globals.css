@@ -39,10 +39,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.545 0.215 276.53);
-  --background-glow:
-    radial-gradient(1100px 750px at 15% 12%, oklch(0.9 0.05 276.53 / 0.6), transparent 60%),
-    radial-gradient(1000px 700px at 88% 18%, oklch(0.92 0.06 300 / 0.5), transparent 60%),
-    radial-gradient(900px 850px at 75% 95%, oklch(0.91 0.04 262 / 0.45), transparent 60%);
+  --glow-1: oklch(0.91 0.06 276.53 / 0.7);
+  --glow-2: oklch(0.93 0.07 300 / 0.6);
+  --glow-3: oklch(0.9 0.05 262 / 0.55);
 }
 
 @theme inline {
@@ -93,7 +92,10 @@
 body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   background-color: var(--background);
-  background-image: var(--background-glow);
+  background-image:
+    radial-gradient(1200px 800px at 15% 12%, var(--glow-1), transparent 60%),
+    radial-gradient(1000px 700px at 88% 18%, var(--glow-2), transparent 60%),
+    radial-gradient(900px 850px at 70% 95%, var(--glow-3), transparent 60%);
   background-attachment: fixed;
   background-size: cover;
 }
@@ -134,10 +136,9 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.585 0.233 277.117);
-  --background-glow:
-    radial-gradient(1100px 750px at 15% 12%, oklch(0.32 0.13 277.117 / 0.55), transparent 60%),
-    radial-gradient(1000px 700px at 88% 18%, oklch(0.24 0.11 300 / 0.55), transparent 60%),
-    radial-gradient(900px 850px at 75% 95%, oklch(0.18 0.09 262 / 0.5), transparent 60%);
+  --glow-1: oklch(0.32 0.13 277.117 / 0.6);
+  --glow-2: oklch(0.24 0.11 300 / 0.6);
+  --glow-3: oklch(0.18 0.09 262 / 0.55);
 }
 
 @layer base {
