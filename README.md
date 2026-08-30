@@ -2,20 +2,20 @@
 
 **Turn your idea into a build-ready architecture.**
 
-ArchAI is an AI-powered tool that transforms natural language project ideas into complete technical blueprints — including architecture diagrams, database schemas, API designs, folder structures, and development roadmaps.
+ArchAI is an AI-powered tool that transforms natural language project ideas into complete technical blueprints, including architecture diagrams, database schemas, API designs, folder structures, and development roadmaps.
 
 ## Features
 
-- **Project Idea Input** — Describe your idea in plain English with optional preferences
-- **AI Architecture Generation** — Get a complete technical blueprint powered by LLM
-- **Architecture Diagram** — Interactive system architecture visualization with React Flow
-- **Database Schema** — Visual ER diagrams and SQL schema output
-- **API Explorer** — Browse all generated endpoints with request/response details
-- **Folder Structure** — Production-ready project structure with copy support
-- **Development Roadmap** — Phased plan with actionable tasks and time estimates
-- **Security & Scalability** — Authentication approach and security considerations
-- **Export** — Download as Markdown or JSON, or copy everything to clipboard
-- **History** — Recent architectures saved in local storage
+- **Project Idea Input**: Describe your idea in plain English with optional preferences
+- **AI Architecture Generation**: Get a complete technical blueprint powered by LLM
+- **Architecture Diagram**: Interactive system architecture visualization with React Flow
+- **Database Schema**: Visual ER diagrams and SQL schema output
+- **API Explorer**: Browse all generated endpoints with request/response details
+- **Folder Structure**: Production-ready project structure with copy support
+- **Development Roadmap**: Phased plan with actionable tasks and time estimates
+- **Security & Scalability**: Authentication approach and security considerations
+- **Export**: Download as Markdown or JSON, or copy everything to clipboard
+- **History**: Recent architectures saved in local storage
 
 ## Tech Stack
 
@@ -113,7 +113,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 6. If invalid, the error is handled gracefully; if valid, it's displayed in the workspace
 7. The architecture is saved to local storage for history
 
-API keys are **never** exposed to the browser — all AI calls happen server-side.
+API keys are **never** exposed to the browser; all AI calls happen server-side.
 
 ## Development
 

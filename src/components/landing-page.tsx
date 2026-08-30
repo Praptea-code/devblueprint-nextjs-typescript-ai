@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+function useMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,6 +29,7 @@ import {
   GitBranch,
   Star,
   Zap,
+  Plus,
 } from "lucide-react";
 
 const EXAMPLE_IDEAS = [
@@ -30,14 +40,6 @@ const EXAMPLE_IDEAS = [
   {
     title: "E-Learning Platform",
     idea: "Create an e-learning platform with live video classes, course management, student progress tracking, quizzes, and a certificate generation system.",
-  },
-  {
-    title: "Food Delivery App",
-    idea: "Build a food delivery application with real-time order tracking, restaurant management, payment processing, driver assignment, and customer reviews.",
-  },
-  {
-    title: "Project Management Tool",
-    idea: "Design a project management tool like Jira with kanban boards, sprint planning, time tracking, team collaboration, and reporting dashboards.",
   },
 ];
 
@@ -56,6 +58,8 @@ export function LandingPage({
   onHistoryClick,
   onDeleteHistory,
 }: LandingPageProps) {
+  const { resolvedTheme } = useTheme();
+  const mounted = useMounted();
   const [idea, setIdea] = useState("");
   const [projectType, setProjectType] = useState("");
   const [techStack, setTechStack] = useState("");
@@ -64,6 +68,11 @@ export function LandingPage({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
   const historyRef = useRef<HTMLDivElement>(null);
+
+  // Hydration-safe theme detection: don't read the resolved theme until the
+  // client has mounted, so the logo doesn't flash/mismatch on first render.
+  const logoSrc =
+    !mounted || resolvedTheme !== "dark" ? "/logo.png" : "/logo2.png";
 
   // Runtime measurement of the hero + inner content column so the orbit's
   // rings and icons are sized/placed against the REAL rendered bounds.
@@ -144,7 +153,7 @@ export function LandingPage({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Image
-              src="/logo.png"
+              src={logoSrc}
               alt="ArchAI logo"
               width={32}
               height={32}
@@ -227,7 +236,7 @@ export function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-16 sm:pb-24">
+      <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-[67px] sm:pt-[83px] pb-[67px] sm:pb-[83px]">
         <HeroOrbit
           heroWidth={orbit?.w ?? null}
           heroHeight={orbit?.h ?? null}
@@ -300,18 +309,12 @@ export function LandingPage({
                 />
               </div>
 
-              {/* Optional fields toggle */}
-              <button
-                type="button"
-                onClick={() => setShowOptions(!showOptions)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showOptions ? "Hide options" : "Add optional details +"}
-              </button>
-
               {/* Optional fields */}
               {showOptions && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div
+                  id="optional-fields"
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1 duration-200"
+                >
                   <div className="space-y-1">
                     <label className="text-xs font-medium text-muted-foreground">
                       Project Type
@@ -363,24 +366,43 @@ export function LandingPage({
                 </div>
               )}
 
-              <Button
-                onClick={handleSubmit}
-                disabled={!idea.trim() || isGenerating}
-                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                size="lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating Architecture...
-                  </>
-                ) : (
-                  <>
-                    Generate Architecture
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
+              {/* Action row: optional-details toggle + generate, centered */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {/* Optional fields toggle */}
+                <button
+                  type="button"
+                  onClick={() => setShowOptions(!showOptions)}
+                  aria-expanded={showOptions}
+                  aria-controls="optional-fields"
+                  className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors cursor-pointer hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-md -ml-1 px-1 py-0.5"
+                >
+                  <Plus
+                    className={`w-4 h-4 transition-transform duration-200 group-hover:text-primary ${
+                      showOptions ? "rotate-45" : ""
+                    }`}
+                  />
+                  {showOptions ? "Hide optional details" : "Add optional details"}
+                </button>
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!idea.trim() || isGenerating}
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating Architecture...
+                    </>
+                  ) : (
+                    <>
+                      Generate Architecture
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -417,7 +439,7 @@ export function LandingPage({
             <div className="flex-1 space-y-3">
               <div className="flex items-center gap-2">
                 <Image
-                  src="/logo.png"
+                  src={logoSrc}
                   alt="ArchAI logo"
                   width={28}
                   height={28}
@@ -426,7 +448,7 @@ export function LandingPage({
                 <span className="font-semibold text-lg text-foreground">ArchAI</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm">
-                ArchAI — Built for developers who dream in architecture. Turn ideas
+                ArchAI: Built for developers who dream in architecture. Turn ideas
                 into complete technical blueprints.
               </p>
             </div>
@@ -454,11 +476,6 @@ export function LandingPage({
                   Resources
                 </h4>
                 <ul className="space-y-2">
-                  <li>
-                    <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                      Contact
-                    </Link>
-                  </li>
                   <li>
                     <a
                       href="https://github.com/Praptea-code/devblueprint-nextjs-typescript-ai"

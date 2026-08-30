@@ -193,7 +193,7 @@ function generateMarkdown(data: ArchitectureResponse): string {
 
   lines.push(`## Tech Stack`);
   data.techStack.forEach((t) => {
-    lines.push(`- **${t.category}**: ${t.technology} — ${t.reason}`);
+    lines.push(`- **${t.category}**: ${t.technology}: ${t.reason}`);
   });
   lines.push("");
 

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArchAI — Turn Your Idea Into Architecture",
+  title: "ArchAI: Turn Your Idea Into Architecture",
   description:
     "AI-powered tool that transforms project ideas into complete technical blueprints with architecture diagrams, database schemas, API designs, and development roadmaps.",
 };

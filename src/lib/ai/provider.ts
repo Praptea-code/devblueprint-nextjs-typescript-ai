@@ -171,7 +171,7 @@ SECURITY:
 - Payment endpoints: recalculate the amount server-side from the DB order; never trust client-supplied totals. Say so in requestBody/description.
 - Populate authorizationNotes only where it applies: payment endpoints, resource-by-ID endpoints, or endpoints exposing sensitive/internal data. Skip it for simple public GETs.
 
-IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation. Every text field must be filled with actual descriptive prose — never use "null", empty values, or "string" placeholders. Populate every field completely with real content before the JSON closes.`;
+IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation. Every text field must be filled with actual descriptive prose: never use "null", empty values, or "string" placeholders. Populate every field completely with real content before the JSON closes.`;
 
 function buildUserPrompt(options: GenerateOptions): string {
   let prompt = `Project Idea: ${options.idea}`;

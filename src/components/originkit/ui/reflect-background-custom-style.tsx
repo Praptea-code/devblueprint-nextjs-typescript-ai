@@ -1,4 +1,4 @@
-// Originkit preset `custom-style` — props baked into the default export.
+// Originkit preset `custom-style`: props baked into the default export.
 "use client"
 
 import * as React from "react"
