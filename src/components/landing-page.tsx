@@ -209,7 +209,7 @@ export function LandingPage({
           </div>
 
           {/* Input Card */}
-          <Card className="border-border/50 bg-card/50">
+          <Card className="border-black/10 bg-card/50 shadow-sm dark:border-border/50">
             <CardContent className="p-6 space-y-4">
               <div className="space-y-2">
                 <label
@@ -221,7 +221,7 @@ export function LandingPage({
                 <Textarea
                   id="idea"
                   placeholder="e.g., I want to build a hospital appointment system where patients can book appointments through WhatsApp..."
-                  className="min-h-[120px] resize-none bg-background border-border/50 text-base placeholder:text-muted-foreground/50 focus-visible:ring-primary"
+                  className="min-h-[120px] resize-none bg-background border-black/15 shadow-sm dark:border-border/50 text-base placeholder:text-muted-foreground/50 focus-visible:ring-primary"
                   value={idea}
                   onChange={(e) => setIdea(e.target.value)}
                   disabled={isGenerating}
@@ -248,7 +248,7 @@ export function LandingPage({
                       value={projectType}
                       onChange={(e) => setProjectType(e.target.value)}
                       disabled={isGenerating}
-                      className="w-full rounded-md border border-border/50 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-md border border-black/15 bg-background shadow-sm px-3 py-2 text-sm dark:border-border/50 focus:outline-none focus:ring-1 focus:ring-primary"
                     >
                       <option value="">Any</option>
                       <option value="web-app">Web Application</option>
@@ -269,7 +269,7 @@ export function LandingPage({
                       value={techStack}
                       onChange={(e) => setTechStack(e.target.value)}
                       disabled={isGenerating}
-                      className="w-full rounded-md border border-border/50 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
+                      className="w-full rounded-md border border-black/15 bg-background shadow-sm px-3 py-2 text-sm dark:border-border/50 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
                     />
                   </div>
                   <div className="space-y-1">
@@ -280,7 +280,7 @@ export function LandingPage({
                       value={experienceLevel}
                       onChange={(e) => setExperienceLevel(e.target.value)}
                       disabled={isGenerating}
-                      className="w-full rounded-md border border-border/50 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-md border border-black/15 bg-background shadow-sm px-3 py-2 text-sm dark:border-border/50 focus:outline-none focus:ring-1 focus:ring-primary"
                     >
                       <option value="">Any</option>
                       <option value="beginner">Beginner</option>
@@ -294,7 +294,7 @@ export function LandingPage({
               <Button
                 onClick={handleSubmit}
                 disabled={!idea.trim() || isGenerating}
-                className="w-full sm:w-auto bg-white text-black border border-black/10 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
                 size="lg"
               >
                 {isGenerating ? (
@@ -323,7 +323,7 @@ export function LandingPage({
                   key={example.title}
                   onClick={() => handleExampleClick(example.idea)}
                   disabled={isGenerating}
-                  className="text-left p-3 rounded-lg border border-border/50 bg-card/30 hover:bg-card/60 hover:border-primary/30 transition-all text-sm group"
+                  className="text-left p-3 rounded-lg border border-black/10 bg-card/30 shadow-sm hover:bg-card/60 hover:border-primary/30 dark:border-border/50 transition-all text-sm group"
                 >
                   <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                     {example.title}
