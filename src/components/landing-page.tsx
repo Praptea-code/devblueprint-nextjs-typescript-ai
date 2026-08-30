@@ -227,7 +227,7 @@ export function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 sm:pb-24">
+      <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-16 sm:pb-24">
         <HeroOrbit
           heroWidth={orbit?.w ?? null}
           heroHeight={orbit?.h ?? null}
