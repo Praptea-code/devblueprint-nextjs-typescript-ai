@@ -39,6 +39,22 @@ export default function Home() {
 
       const data = await response.json();
 
+      if (response.status === 429) {
+        const reset = typeof data.reset === "number" ? data.reset : null;
+        const minutes =
+          reset !== null
+            ? Math.max(1, Math.ceil((reset - Date.now()) / 60000))
+            : null;
+        setError(
+          minutes !== null
+            ? `Rate limit reached. Please try again in ${minutes} minute${
+                minutes === 1 ? "" : "s"
+              }.`
+            : "Rate limit reached. Please try again in a few minutes."
+        );
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to generate architecture");
       }
