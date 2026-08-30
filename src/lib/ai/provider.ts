@@ -11,6 +11,23 @@ export interface AIProvider {
   generateArchitecture(options: GenerateOptions): Promise<ArchitectureResponse>;
 }
 
+function repairNulls(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => repairNulls(item));
+  }
+  if (typeof value === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value)) {
+      result[key] = repairNulls(item);
+    }
+    return result;
+  }
+  return value;
+}
+
 const SYSTEM_PROMPT = `You are an expert software architect. Given a project idea, generate a complete technical architecture blueprint.
 
 You MUST respond with valid JSON that matches this exact structure:
@@ -105,7 +122,8 @@ You MUST respond with valid JSON that matches this exact structure:
       "description": "string",
       "requiresAuth": true,
       "requestBody": "string describing the request body (for POST/PUT/PATCH)",
-      "responseExample": "string showing example JSON response"
+      "responseExample": "string showing example JSON response",
+      "authorizationNotes": "string describing any role-based or ownership-based authorization checks required beyond basic authentication (omit only if the endpoint is fully public)"
     }
   ],
   "authentication": {
@@ -147,7 +165,14 @@ You MUST respond with valid JSON that matches this exact structure:
 
 Be thorough and specific. Generate realistic database schemas with proper types, relationships, and constraints. Include 8-15 API endpoints. Include 4-6 roadmap phases. The folder structure should be production-ready and match the recommended tech stack.
 
-IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation.`;
+SECURITY GUIDELINES FOR EVERY BLUEPRINT:
+1. Authorization vs Authentication: requiresAuth=true only means "authenticated." Do not stop there. For every protected endpoint, also define authorization (roles or ownership) and capture it in the endpoint's authorizationNotes field:
+   - Endpoints that expose sensitive internal or operational data (e.g., live driver location, admin-only lists, audit logs, other users' data) must specify exactly which role or internal service may call them (e.g., "driver-role only", "admin-role only", "internal service only with service token"), never just requiresAuth.
+   - Endpoints that operate on a resource by ID (e.g., update/delete an order, review, or user by ID) must note that the backend verifies the resource belongs to the requesting user (object-level authorization / anti-IDOR) before allowing the action.
+2. Payment security: Whenever a payment-related endpoint is generated (e.g., create payment intent, charge, refund, webhook), make the requestBody and description explicit that any amount is recalculated server-side from the actual order record in the database and never trusted directly from client input. Amount totals must always be derived server-side.
+3. Always populate authorizationNotes for endpoints that touch sensitive data, other users' resources, or payments. Only fully public endpoints may omit it.
+
+IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation. Every text field must be filled with actual descriptive prose — never use "null", empty values, or "string" placeholders. Populate every field completely with real content before the JSON closes.`;
 
 function buildUserPrompt(options: GenerateOptions): string {
   let prompt = `Project Idea: ${options.idea}`;
@@ -176,8 +201,12 @@ function parseAndValidateResponse(raw: string): ArchitectureResponse {
   }
   cleaned = cleaned.trim();
 
+  // Strip reasoning-model thinking blocks (e.g. <thinking>...</thinking>)
+  cleaned = cleaned.replace(/<thinking[^>]*>[\s\S]*?<\/thinking>/g, "").trim();
+
   const parsed = JSON.parse(cleaned);
-  const result = architectureSchema.safeParse(parsed);
+  const repaired = repairNulls(parsed) as Record<string, unknown>;
+  const result = architectureSchema.safeParse(repaired);
 
   if (!result.success) {
     console.error("Validation errors:", result.error.flatten());
@@ -274,12 +303,61 @@ export function createAnthropicProvider(): AIProvider {
   };
 }
 
+export function createGroqProvider(): AIProvider {
+  return {
+    async generateArchitecture(options: GenerateOptions): Promise<ArchitectureResponse> {
+      const apiKey = process.env.GROQ_API_KEY;
+      if (!apiKey) throw new Error("GROQ_API_KEY is not configured");
+
+      const model = process.env.AI_MODEL || "qwen/qwen3.6-27b";
+
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: SYSTEM_PROMPT },
+              { role: "user", content: buildUserPrompt(options) },
+            ],
+            temperature: 0.7,
+            max_tokens: 6800,
+            response_format: { type: "json_object" },
+            reasoning_effort: "none",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Groq API error: ${error}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+
+      if (!content) {
+        throw new Error("No content in Groq response");
+      }
+
+      return parseAndValidateResponse(content);
+    },
+  };
+}
+
 export function getAIProvider(): AIProvider {
   const provider = process.env.AI_PROVIDER || "openai";
 
   switch (provider) {
     case "anthropic":
       return createAnthropicProvider();
+    case "groq":
+      return createGroqProvider();
     case "openai":
     default:
       return createOpenAIProvider();
