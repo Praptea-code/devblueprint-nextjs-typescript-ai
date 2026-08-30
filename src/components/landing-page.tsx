@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SiteNav } from "@/components/site-nav";
 import { HeroOrbit } from "@/components/hero-orbit";
 import type { HistoryEntry } from "@/lib/utils/history";
 import {
@@ -149,20 +150,8 @@ export function LandingPage({
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Image
-              src={logoSrc}
-              alt="ArchAI logo"
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
-            <span className="font-semibold text-lg">ArchAI</span>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="hidden sm:flex items-center gap-5">
+      <SiteNav>
+        <div className="hidden sm:flex items-center gap-5">
               <div className="relative" ref={historyRef}>
                 <button
                   type="button"
@@ -231,9 +220,7 @@ export function LandingPage({
             </div>
 
             <ThemeToggle />
-          </div>
-        </div>
-      </header>
+          </SiteNav>
 
       {/* Hero Section */}
       <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-[67px] sm:pt-[83px] pb-[67px] sm:pb-[83px]">
