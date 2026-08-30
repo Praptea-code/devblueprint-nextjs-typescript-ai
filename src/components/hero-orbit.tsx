@@ -31,17 +31,23 @@ interface OrbitProps {
 // brief, so the existing tech-icon set keeps its left/right grouping/order).
 // Angles are symmetric around the horizontal axis (180°/0°) so the icons
 // distribute evenly from the top badge row down to the examples grid.
-const DEFS: { icon: LucideIcon; label: string; angle: number; key: "small" | "large" }[] = [
+const DEFS: {
+  icon: LucideIcon;
+  label: string;
+  angle: number;
+  key: "small" | "large";
+  radiusBoost?: number;
+}[] = [
   // Left side
   { icon: Atom, label: "React", angle: 225, key: "small" },
   { icon: Layers, label: "Next.js", angle: 203, key: "large" },
   { icon: FileCode2, label: "TypeScript", angle: 157, key: "large" },
-  { icon: Database, label: "PostgreSQL", angle: 135, key: "small" },
+  { icon: Database, label: "PostgreSQL", angle: 135, key: "small", radiusBoost: 70 },
   // Right side (mirror)
   { icon: Box, label: "Docker", angle: -45, key: "small" },
   { icon: Hexagon, label: "Node.js", angle: -23, key: "large" },
   { icon: Wind, label: "Tailwind", angle: 23, key: "large" },
-  { icon: Cloud, label: "AWS", angle: 45, key: "small" },
+  { icon: Cloud, label: "AWS", angle: 45, key: "small", radiusBoost: 70 },
 ];
 
 const ICON_DIAMETER = 40;
@@ -80,7 +86,8 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
     const largest = middle + 140;
     const ringRadii = [smallest, middle, largest];
 
-    const baseRadius = (key: "small" | "large") => (key === "small" ? smallest : largest);
+    const baseRadius = (def: (typeof DEFS)[number]) =>
+      (def.key === "small" ? smallest : largest) + (def.radiusBoost ?? 0);
 
     // Icons frame the actual content column: center them on the content's
     // vertical center and size the vertical spread to the content's height so
@@ -92,7 +99,7 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
     // Place each icon on its ring; if its 40px circle would touch the content
     // column (center within SAFETY_GAP of the rect), bump radius by 40px.
     const icons = DEFS.map((def) => {
-      let r = baseRadius(def.key);
+      let r = baseRadius(def);
       let x = 0;
       let y = 0;
       for (let i = 0; i < 8; i++) {
