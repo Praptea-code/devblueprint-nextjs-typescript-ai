@@ -77,9 +77,10 @@ cp .env.example .env.local
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `AI_PROVIDER` | `"openai"` or `"anthropic"` | Yes |
+| `AI_PROVIDER` | `"openai"`, `"anthropic"`, or `"groq"` | Yes |
 | `OPENAI_API_KEY` | OpenAI API key | If using OpenAI |
 | `ANTHROPIC_API_KEY` | Anthropic API key | If using Anthropic |
+| `GROQ_API_KEY` | Groq API key | If using Groq |
 | `AI_MODEL` | Model name (defaults to provider's best) | No |
 
 ## Local Setup

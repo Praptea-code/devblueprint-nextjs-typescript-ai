@@ -123,7 +123,7 @@ You MUST respond with valid JSON that matches this exact structure:
       "requiresAuth": true,
       "requestBody": "string describing the request body (for POST/PUT/PATCH)",
       "responseExample": "string showing example JSON response",
-      "authorizationNotes": "string describing any role-based or ownership-based authorization checks required beyond basic authentication (omit only if the endpoint is fully public)"
+      "authorizationNotes": "string (role/ownership checks beyond auth; omit for public endpoints)"
     }
   ],
   "authentication": {
@@ -163,14 +163,13 @@ You MUST respond with valid JSON that matches this exact structure:
   "futureImprovements": ["string"]
 }
 
-Be thorough and specific. Generate realistic database schemas with proper types, relationships, and constraints. Include 8-15 API endpoints. Include 4-6 roadmap phases. The folder structure should be production-ready and match the recommended tech stack.
+Be thorough. Include 8-15 API endpoints and 4-6 roadmap phases.
 
-SECURITY GUIDELINES FOR EVERY BLUEPRINT:
-1. Authorization vs Authentication: requiresAuth=true only means "authenticated." Do not stop there. For every protected endpoint, also define authorization (roles or ownership) and capture it in the endpoint's authorizationNotes field:
-   - Endpoints that expose sensitive internal or operational data (e.g., live driver location, admin-only lists, audit logs, other users' data) must specify exactly which role or internal service may call them (e.g., "driver-role only", "admin-role only", "internal service only with service token"), never just requiresAuth.
-   - Endpoints that operate on a resource by ID (e.g., update/delete an order, review, or user by ID) must note that the backend verifies the resource belongs to the requesting user (object-level authorization / anti-IDOR) before allowing the action.
-2. Payment security: Whenever a payment-related endpoint is generated (e.g., create payment intent, charge, refund, webhook), make the requestBody and description explicit that any amount is recalculated server-side from the actual order record in the database and never trusted directly from client input. Amount totals must always be derived server-side.
-3. Always populate authorizationNotes for endpoints that touch sensitive data, other users' resources, or payments. Only fully public endpoints may omit it.
+SECURITY:
+- requiresAuth=true only means "authenticated", not "authorized". For each protected endpoint, put role/ownership checks in authorizationNotes.
+- Given restricted resources by type: sensitive/internal data (live location, admin lists) => name the calling role or service (e.g. "driver-role only", "internal service only"). Resource-by-ID endpoints (orders, reviews, users) => note backend verifies the resource belongs to the requester (anti-IDOR).
+- Payment endpoints: recalculate the amount server-side from the DB order; never trust client-supplied totals. Say so in requestBody/description.
+- Populate authorizationNotes only where it applies: payment endpoints, resource-by-ID endpoints, or endpoints exposing sensitive/internal data. Skip it for simple public GETs.
 
 IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanation. Every text field must be filled with actual descriptive prose — never use "null", empty values, or "string" placeholders. Populate every field completely with real content before the JSON closes.`;
 
@@ -350,6 +349,54 @@ export function createGroqProvider(): AIProvider {
   };
 }
 
+export function createOpenRouterProvider(): AIProvider {
+  return {
+    async generateArchitecture(options: GenerateOptions): Promise<ArchitectureResponse> {
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      if (!apiKey) throw new Error("OPENROUTER_API_KEY is not configured");
+
+      const model = process.env.AI_MODEL || "openai/gpt-4o-mini";
+
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+            "HTTP-Referer": process.env.OPENROUTER_REFERRER || "",
+            "X-Title": "ArchAI",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: SYSTEM_PROMPT },
+              { role: "user", content: buildUserPrompt(options) },
+            ],
+            temperature: 0.7,
+            max_tokens: 8000,
+            response_format: { type: "json_object" },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`OpenRouter API error: ${error}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+
+      if (!content) {
+        throw new Error("No content in OpenRouter response");
+      }
+
+      return parseAndValidateResponse(content);
+    },
+  };
+}
+
 export function getAIProvider(): AIProvider {
   const provider = process.env.AI_PROVIDER || "openai";
 
@@ -358,6 +405,8 @@ export function getAIProvider(): AIProvider {
       return createAnthropicProvider();
     case "groq":
       return createGroqProvider();
+    case "openrouter":
+      return createOpenRouterProvider();
     case "openai":
     default:
       return createOpenAIProvider();
