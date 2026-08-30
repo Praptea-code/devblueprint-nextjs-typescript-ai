@@ -89,6 +89,17 @@ export function ApiExplorer({ data }: ApiExplorerProps) {
                           )}
                         </div>
 
+                        {ep.authorizationNotes && (
+                          <div>
+                            <h5 className="text-xs font-medium text-muted-foreground mb-1">
+                              Authorization Notes
+                            </h5>
+                            <p className="text-sm border border-border/30 rounded bg-amber-500/5 text-foreground p-3">
+                              {ep.authorizationNotes}
+                            </p>
+                          </div>
+                        )}
+
                         {ep.requestBody && (
                           <div>
                             <h5 className="text-xs font-medium text-muted-foreground mb-1">

@@ -82,6 +82,7 @@ export interface GeneratedArchitecture {
     requiresAuth: boolean;
     requestBody?: string;
     responseExample: string;
+    authorizationNotes?: string;
   }[];
   authentication: {
     approach: string;

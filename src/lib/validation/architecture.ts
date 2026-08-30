@@ -85,6 +85,7 @@ const apiEndpointSchema = z.object({
   requiresAuth: z.boolean(),
   requestBody: z.string().optional(),
   responseExample: z.string(),
+  authorizationNotes: z.string().optional(),
 });
 
 const authenticationSchema = z.object({
