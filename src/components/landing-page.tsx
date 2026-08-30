@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HeroOrbit } from "@/components/hero-orbit";
 import type { HistoryEntry } from "@/lib/utils/history";
 import {
   ArrowRight,
@@ -19,6 +20,8 @@ import {
   Trash2,
   ChevronDown,
   GitBranch,
+  Star,
+  Zap,
 } from "lucide-react";
 
 const EXAMPLE_IDEAS = [
@@ -61,7 +64,15 @@ export function LandingPage({
   const [experienceLevel, setExperienceLevel] = useState("");
   const [showOptions, setShowOptions] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [activityIdx, setActivityIdx] = useState(0);
   const historyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActivityIdx((i) => (i + 1) % EXAMPLE_IDEAS.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!historyOpen) return;
@@ -193,13 +204,26 @@ export function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="max-w-3xl w-full space-y-8">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 overflow-hidden">
+        <HeroOrbit />
+        <div className="relative z-10 max-w-3xl w-full space-y-8">
           {/* Title */}
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              <Sparkles className="w-3.5 h-3.5" />
-              AI-Powered Architecture Generation
+            {/* Top badges */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="https://github.com/Praptea-code/devblueprint-nextjs-typescript-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border/50 bg-card/40 text-sm text-muted-foreground hover:bg-card/70 hover:text-foreground transition-colors"
+              >
+                <Star className="w-3.5 h-3.5 fill-current" />
+                Open Source on GitHub
+              </a>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                <Sparkles className="w-3.5 h-3.5" />
+                AI-Powered Architecture Generation
+              </div>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
               Turn your idea into a
@@ -210,6 +234,23 @@ export function LandingPage({
               Describe your project idea and get a complete technical blueprint
               with architecture diagrams, database schemas, API designs, and more.
             </p>
+
+            {/* Floating activity card */}
+            <div className="flex justify-center">
+              <div
+                key={activityIdx}
+                className="inline-flex items-center gap-2 rounded-lg border border-border/50 bg-card/60 px-3 py-2 text-sm text-muted-foreground shadow-sm animate-in fade-in slide-in-from-top-1 duration-300"
+              >
+                <Zap className="w-4 h-4 text-primary shrink-0" />
+                <span>
+                  Someone generated a{" "}
+                  <span className="font-medium text-foreground">
+                    {EXAMPLE_IDEAS[activityIdx].title}
+                  </span>{" "}
+                  blueprint · 2 min ago
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Input Card */}
@@ -316,7 +357,7 @@ export function LandingPage({
             </CardContent>
           </Card>
 
-          {/* Example Ideas */}
+          {/* Example ideas (below hero) */}
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground text-center">
               Or try one of these examples:
