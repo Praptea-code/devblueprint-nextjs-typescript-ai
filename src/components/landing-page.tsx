@@ -12,8 +12,6 @@ import type { HistoryEntry } from "@/lib/utils/history";
 import {
   ArrowRight,
   Sparkles,
-  Code2,
-  Database,
   Loader2,
   History,
   Clock,
@@ -66,6 +64,40 @@ export function LandingPage({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
   const historyRef = useRef<HTMLDivElement>(null);
+
+  // Runtime measurement of the hero + inner content column so the orbit's
+  // rings and icons are sized/placed against the REAL rendered bounds.
+  const mainRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [orbit, setOrbit] = useState<{
+    w: number;
+    h: number;
+    content: { left: number; top: number; w: number; h: number };
+  } | null>(null);
+
+  useEffect(() => {
+    const measure = () => {
+      const hero = mainRef.current;
+      const content = contentRef.current;
+      if (!hero || !content) return;
+      const hr = hero.getBoundingClientRect();
+      const cr = content.getBoundingClientRect();
+      setOrbit({
+        w: hr.width,
+        h: hr.height,
+        content: { left: cr.left - hr.left, top: cr.top - hr.top, w: cr.width, h: cr.height },
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (mainRef.current) ro.observe(mainRef.current);
+    if (contentRef.current) ro.observe(contentRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -122,15 +154,6 @@ export function LandingPage({
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="hidden sm:flex items-center gap-5">
-              <span className="flex items-center gap-1.5">
-                <Code2 className="w-3.5 h-3.5" />
-                AI-Powered
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5" />
-                Full Architecture
-              </span>
-
               <div className="relative" ref={historyRef}>
                 <button
                   type="button"
@@ -204,9 +227,13 @@ export function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 overflow-hidden">
-        <HeroOrbit />
-        <div className="relative z-10 max-w-3xl w-full space-y-8">
+      <main ref={mainRef} className="relative flex-1 flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 sm:pb-24">
+        <HeroOrbit
+          heroWidth={orbit?.w ?? null}
+          heroHeight={orbit?.h ?? null}
+          contentRect={orbit?.content ?? null}
+        />
+        <div ref={contentRef} className="relative z-10 max-w-3xl w-full space-y-8">
           {/* Title */}
           <div className="text-center space-y-4">
             {/* Top badges */}
