@@ -29,17 +29,19 @@ interface OrbitProps {
 // (angle degrees, radius key) per spec. angles: 0° = 3 o'clock, clockwise.
 // Icons are mapped to these angles in order (mapping not specified in the
 // brief, so the existing tech-icon set keeps its left/right grouping/order).
+// Angles are symmetric around the horizontal axis (180°/0°) so the icons
+// distribute evenly from the top badge row down to the examples grid.
 const DEFS: { icon: LucideIcon; label: string; angle: number; key: "small" | "large" }[] = [
   // Left side
-  { icon: Atom, label: "React", angle: 165, key: "small" },
-  { icon: Layers, label: "Next.js", angle: 185, key: "large" },
-  { icon: FileCode2, label: "TypeScript", angle: 205, key: "large" },
-  { icon: Database, label: "PostgreSQL", angle: 225, key: "small" },
+  { icon: Atom, label: "React", angle: 225, key: "small" },
+  { icon: Layers, label: "Next.js", angle: 203, key: "large" },
+  { icon: FileCode2, label: "TypeScript", angle: 157, key: "large" },
+  { icon: Database, label: "PostgreSQL", angle: 135, key: "small" },
   // Right side (mirror)
-  { icon: Box, label: "Docker", angle: 15, key: "small" },
-  { icon: Hexagon, label: "Node.js", angle: -15, key: "large" },
-  { icon: Wind, label: "Tailwind", angle: -25, key: "large" },
-  { icon: Cloud, label: "AWS", angle: -45, key: "small" },
+  { icon: Box, label: "Docker", angle: -45, key: "small" },
+  { icon: Hexagon, label: "Node.js", angle: -23, key: "large" },
+  { icon: Wind, label: "Tailwind", angle: 23, key: "large" },
+  { icon: Cloud, label: "AWS", angle: 45, key: "small" },
 ];
 
 const ICON_DIAMETER = 40;
@@ -47,8 +49,12 @@ const ICON_RADIUS = ICON_DIAMETER / 2;
 const SAFETY_GAP = 20;
 const BUCKET_STEP = 40;
 
-// Diameter of an icon badge (the padding wrapper is 40px) — same as ICON_DIAMETER.
+// Diameter of an icon badge (the padding wrapper is 40px), same as ICON_DIAMETER.
 const BADGE_SIZE = 40;
+
+// Distinct per-icon float timings so the 8 badges never drift in sync.
+const FLOAT_DURATIONS = [5.2, 6.1, 7.4, 5.8, 8, 6.6, 7.1, 5.5];
+const FLOAT_DELAYS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
 
 export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
   const spec = useMemo(() => {
@@ -76,6 +82,13 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
 
     const baseRadius = (key: "small" | "large") => (key === "small" ? smallest : largest);
 
+    // Icons frame the actual content column: center them on the content's
+    // vertical center and size the vertical spread to the content's height so
+    // they distribute from the top badge row down to the examples grid (and
+    // follow the content as it grows/shrinks).
+    const iconCy = cr.top + cr.h / 2;
+    const iconVHalf = Math.max(cr.h / 2 + 60, 120);
+
     // Place each icon on its ring; if its 40px circle would touch the content
     // column (center within SAFETY_GAP of the rect), bump radius by 40px.
     const icons = DEFS.map((def) => {
@@ -85,7 +98,7 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
       for (let i = 0; i < 8; i++) {
         const rad = (def.angle * Math.PI) / 180;
         x = cx + r * Math.cos(rad);
-        y = cy + r * Math.sin(rad);
+        y = iconCy + iconVHalf * Math.sin(rad);
 
         // Distance from icon center to the nearest point on the content rect
         // (treating the icon as its 40px-diameter circle).
@@ -118,10 +131,10 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
       };
     });
 
-    // Tick marks for the two innermost icons (165° and 15°): a short 20px
+    // Tick marks for the two innermost icons (157° and 23°): a short 20px
     // diagonal line centered on the icon, angled 45° off the radial.
     const ticks = icons
-      .filter((icon) => icon.angle === 165 || icon.angle === 15)
+      .filter((icon) => icon.angle === 157 || icon.angle === 23)
       .map((icon) => {
         const a = ((icon.angle + 45) * Math.PI) / 180;
         const nx = Math.cos(a);
@@ -172,7 +185,7 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
         ))}
       </svg>
 
-      {spec.icons.map((icon) => {
+      {spec.icons.map((icon, index) => {
         const Icon = icon.icon;
         return (
           <div
@@ -186,7 +199,12 @@ export function HeroOrbit({ heroWidth, heroHeight, contentRect }: OrbitProps) {
           >
             <div
               className="hero-float flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.06)] dark:border-white/10 dark:bg-card"
-              style={{ width: BADGE_SIZE, height: BADGE_SIZE }}
+              style={{
+                width: BADGE_SIZE,
+                height: BADGE_SIZE,
+                animationDuration: `${FLOAT_DURATIONS[index % FLOAT_DURATIONS.length]}s`,
+                animationDelay: `${FLOAT_DELAYS[index % FLOAT_DELAYS.length]}s`,
+              }}
             >
               <Icon className="h-5 w-5" />
             </div>
