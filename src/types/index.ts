@@ -5,6 +5,7 @@ export interface ProjectInput {
   projectType?: string;
   techStack?: string;
   experienceLevel?: string;
+  region?: string;
 }
 
 export interface GeneratedArchitecture {

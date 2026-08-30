@@ -5,6 +5,7 @@ export interface GenerateOptions {
   projectType?: string;
   techStack?: string;
   experienceLevel?: string;
+  region?: string;
 }
 
 export interface AIProvider {
@@ -165,6 +166,10 @@ You MUST respond with valid JSON that matches this exact structure:
 
 Be thorough. Include 8-15 API endpoints and 4-6 roadmap phases.
 
+REGIONAL SERVICES:
+- If a target region/country is specified, choose external services (payment processing, SMS/messaging, maps, storage, etc.) that are actually available and commonly used in that region, rather than defaulting to US-centric services. For example, for Nepal, prefer eSewa or Khalti over Stripe for payments, and Sparrow SMS over Twilio for SMS — always pick services with real regional availability, not just well-known global brands.
+- If no region is specified, default to globally available services (Stripe, Twilio, AWS, etc.) but note in the externalServices description if a service has known regional restrictions.
+
 SECURITY:
 - requiresAuth=true only means "authenticated", not "authorized". For each protected endpoint, put role/ownership checks in authorizationNotes.
 - Given restricted resources by type: sensitive/internal data (live location, admin lists) => name the calling role or service (e.g. "driver-role only", "internal service only"). Resource-by-ID endpoints (orders, reviews, users) => note backend verifies the resource belongs to the requester (anti-IDOR).
@@ -183,6 +188,9 @@ function buildUserPrompt(options: GenerateOptions): string {
   }
   if (options.experienceLevel) {
     prompt += `\nDeveloper Experience Level: ${options.experienceLevel}`;
+  }
+  if (options.region) {
+    prompt += `\nTarget Region/Country: ${options.region}`;
   }
   return prompt;
 }

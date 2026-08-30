@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { getAIProvider } from "@/lib/ai/provider";
-
-const requestSchema = z.object({
-  idea: z.string().min(10, "Please provide a more detailed project idea (at least 10 characters)"),
-  projectType: z.string().optional(),
-  techStack: z.string().optional(),
-  experienceLevel: z.string().optional(),
-});
+import { generateRequestSchema } from "@/lib/validation/architecture";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const parsed = requestSchema.safeParse(body);
+    const parsed = generateRequestSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

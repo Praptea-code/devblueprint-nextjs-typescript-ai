@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+export const generateRequestSchema = z.object({
+  idea: z.string().min(10, "Please provide a more detailed project idea (at least 10 characters)"),
+  projectType: z.string().optional(),
+  techStack: z.string().optional(),
+  experienceLevel: z.string().optional(),
+  region: z.string().optional(),
+});
+
+export type GenerateRequest = z.infer<typeof generateRequestSchema>;
+
 const featureSchema = z.object({
   name: z.string(),
   description: z.string(),

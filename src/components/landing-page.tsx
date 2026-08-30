@@ -45,7 +45,7 @@ const EXAMPLE_IDEAS = [
 ];
 
 interface LandingPageProps {
-  onGenerate: (idea: string, options?: { projectType?: string; techStack?: string; experienceLevel?: string }) => void;
+  onGenerate: (idea: string, options?: { projectType?: string; techStack?: string; experienceLevel?: string; region?: string }) => void;
   isGenerating: boolean;
   history: HistoryEntry[];
   onHistoryClick: (entry: HistoryEntry) => void;
@@ -65,6 +65,7 @@ export function LandingPage({
   const [projectType, setProjectType] = useState("");
   const [techStack, setTechStack] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
+  const [region, setRegion] = useState("");
   const [showOptions, setShowOptions] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
@@ -140,6 +141,7 @@ export function LandingPage({
       projectType: projectType || undefined,
       techStack: techStack || undefined,
       experienceLevel: experienceLevel || undefined,
+      region: region || undefined,
     });
   };
 
@@ -300,7 +302,7 @@ export function LandingPage({
               {showOptions && (
                 <div
                   id="optional-fields"
-                  className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-1 duration-200"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1 duration-200"
                 >
                   <div className="space-y-1">
                     <label className="text-xs font-medium text-muted-foreground">
@@ -349,6 +351,19 @@ export function LandingPage({
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
                     </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Target region/country (optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Nepal, India, Germany"
+                      value={region}
+                      onChange={(e) => setRegion(e.target.value)}
+                      disabled={isGenerating}
+                      className="w-full rounded-md border border-black/15 bg-background shadow-sm px-3 py-2 text-sm dark:border-border/50 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/50"
+                    />
                   </div>
                 </div>
               )}

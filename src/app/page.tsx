@@ -26,7 +26,7 @@ export default function Home() {
 
   const handleGenerate = async (
     idea: string,
-    options?: { projectType?: string; techStack?: string; experienceLevel?: string }
+    options?: { projectType?: string; techStack?: string; experienceLevel?: string; region?: string }
   ) => {
     setIsGenerating(true);
     setError(null);
